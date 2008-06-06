@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "Data::Pairs 3"
-.TH Data::Pairs 3 "2008-06-05" "perl v5.8.8" "User Contributed Perl Documentation"
+.TH Data::Pairs 3 "2008-06-06" "perl v5.8.8" "User Contributed Perl Documentation"
 .SH "NAME"
 Data::Pairs \- Perl module to implement ordered mappings with possibly
 duplicate keys.
@@ -201,7 +201,7 @@ regular hashes.
 .PP
 A closely related class, Data::Omap, implements the \s-1YAML\s0 \f(CW\*(C`!!omap\*(C'\fR
 data type, http://yaml.org/type/omap.html.  Data::Omap objects are
-also ordered sequences of key:value pairs but they do not allow
+also ordered sequences of key/value pairs but they do not allow
 duplicate keys.
 .PP
 While ordered mappings are in order, they are not necessarily in a
@@ -223,7 +223,7 @@ Normally, the underlying structure of an \s-1OO\s0 object is encapsulated
 and not directly accessible (when you play nice). One key
 implementation detail of Data::Pairs is the desire that the underlying
 ordered mapping data structure (an array of single-key hashes) be
-publically maintained as such and directly accessible, if desired.
+publically maintained as such and directly accessible if desired.
 .PP
 To that end, no attributes but the data itself are stored in the
 objects.  In the current version, that is why \f(CW\*(C`order()\*(C'\fR is a class
@@ -243,7 +243,7 @@ this could be accomplished by passing the object through a formatting
 routine, but I wanted to see first how this implementation might work.
 .SH "VERSION"
 .IX Header "VERSION"
-Data::Pairs version 0.03
+Data::Pairs version 0.04
 .SH "CLASS METHODS"
 .IX Header "CLASS METHODS"
 .Sh "Data::Pairs\->\fInew()\fP;"
@@ -284,7 +284,7 @@ Otherwise, accepts the predefined orderings: 'na', 'nd', 'sa', 'sd',
 .PP
 .Vb 7
 \& Data::Pairs->order( 'na' );   # numeric ascending
-\& Data::Pairs->order( 'nd' );   # numeric ascending
+\& Data::Pairs->order( 'nd' );   # numeric descending
 \& Data::Pairs->order( 'sa' );   # string  ascending
 \& Data::Pairs->order( 'sd' );   # string  descending
 \& Data::Pairs->order( 'sna' );  # string/numeric ascending
@@ -306,7 +306,7 @@ Returns the code reference if ordering is \s-1ON\s0, a false value if \s-1OFF\s0
 .PP
 Note, when object-level ordering is implemented, it is expected that
 the class-level option will still be available.  In that case, any
-new objects will inherite the class-level ordering unless overridden
+new objects will inherit the class-level ordering unless overridden
 at the object level.
 .SH "OBJECT METHODS"
 .IX Header "OBJECT METHODS"
@@ -345,7 +345,7 @@ Get a value or values.
 Regardless of parameters, if the object is empty, undef is returned in
 scalar context, an empty list in list context.
 .PP
-If no paramaters, gets all the values.  In scalar context, gives
+If no parameters, gets all the values.  In scalar context, gives
 number of values in the object.
 .PP
 .Vb 3
@@ -398,15 +398,13 @@ Returns \f(CW$value\fR.
 .ie n .Sh "$pairs\->_add_ordered( $key\fP => \f(CW$value );"
 .el .Sh "$pairs\->_add_ordered( \f(CW$key\fP => \f(CW$value\fP );"
 .IX Subsection "$pairs->_add_ordered( $key => $value );"
-Private routine used by \f(CW\*(C`set()\*(C'\fR and \f(CW\*(C`add()\*(C'\fR.
+Private routine used by \f(CW\*(C`set()\*(C'\fR and \f(CW\*(C`add()\*(C'\fR; should not be called
+directly.
 .PP
 Accepts \f(CW$key\fR and \f(CW$value\fR.
 .PP
 Adds a new key/value pair to the end or merged according to the
 defined \f(CW\*(C`order()\*(C'\fR.
-.PP
-This routine should not be called directly, because it does not
-check for duplicates.
 .PP
 Has no defined return value.
 .ie n .Sh "$pairs\->get_pos( $key );"
@@ -416,7 +414,7 @@ Gets position(s) where a key is found.
 .PP
 Accepts one key (any extras are silently ignored).  
 .PP
-In list context, returns a list of positions where the keys is found.
+In list context, returns a list of positions where the key is found.
 .PP
 In scalar context, if the key only appears once, that position is
 returned.  If the key appears more than once, an array ref is returned,
@@ -437,9 +435,8 @@ which contains all the positions, e.g.,
 .Ve
 .PP
 Returns \f(CW\*(C`()/undef\*(C'\fR if no key given, no keys found, or object is empty.
-.ie n .Sh "$pairs\->get_pos_hash( @keys );"
-.el .Sh "$pairs\->get_pos_hash( \f(CW@keys\fP );"
-.IX Subsection "$pairs->get_pos_hash( @keys );"
+.Sh "$pairs\->get_pos_hash( [@keys] );"
+.IX Subsection "$pairs->get_pos_hash( [@keys] );"
 Gets positions where keys are found.
 .PP
 Accepts zero or more keys.
@@ -457,10 +454,9 @@ once, the positions are stored as arrays.
 .PP
 If a given key is not found, it will not appear in the returned hash.
 .PP
-Returns \f(CW\*(C`undef/()\*(C'\fR if no keys given or object is empty.
-.ie n .Sh "$pairs\->get_keys( @keys );"
-.el .Sh "$pairs\->get_keys( \f(CW@keys\fP );"
-.IX Subsection "$pairs->get_keys( @keys );"
+Returns \f(CW\*(C`undef/()\*(C'\fR if object is empty.
+.Sh "$pairs\->get_keys( [@keys] );"
+.IX Subsection "$pairs->get_keys( [@keys] );"
 Gets keys.
 .PP
 Accepts zero or more keys.  If no keys are given, returns all the
@@ -481,9 +477,8 @@ order found in the object, e.g.,
 \& @keys    = $pairs->get_keys( 'c', 'b', 'A' );  # @keys is (b, c, b, b)
 \& $howmany = $pairs->get_keys( 'c', 'b', 'A' );  # $howmany is 4
 .Ve
-.ie n .Sh "$pairs\->get_array( @keys );"
-.el .Sh "$pairs\->get_array( \f(CW@keys\fP );"
-.IX Subsection "$pairs->get_array( @keys );"
+.Sh "$pairs\->get_array( [@keys] );"
+.IX Subsection "$pairs->get_array( [@keys] );"
 Gets an array of key/value pairs.
 .PP
 Accepts zero or more keys.  If no keys are given, returns a list of
@@ -531,17 +526,23 @@ Returns true if key is found in object, false if not.
 .PP
 This routine supports the tied hash \s-1EXISTS\s0 method, but may reasonably
 be called directly, too.
-.ie n .Sh "$pairs\->delete( $key );"
-.el .Sh "$pairs\->delete( \f(CW$key\fP );"
-.IX Subsection "$pairs->delete( $key );"
-Accepts one key.  If key is found, removes the \fIfirst\fR matching
-key/value pair from the object.  Must be repeated in a loop to delete
-all occurrences of the key from the object.
+.ie n .Sh "$pairs\->delete( $key\fP[, \f(CW$pos] );"
+.el .Sh "$pairs\->delete( \f(CW$key\fP[, \f(CW$pos\fP] );"
+.IX Subsection "$pairs->delete( $key[, $pos] );"
+Accepts one key and an optional position.
+.PP
+If \f(CW$pos\fR is given and the key at that position equals \f(CW$key\fR, that
+key/value pair will be deleted.  Otherwise, the \fIfirst\fR key/value
+pair that matches \f(CW$key\fR will be deleted.
+.PP
+If \f(CW$key\fR occurs multiple times, \f(CW\*(C`delete()\*(C'\fR must be called multiple
+times to delete them all.
 .PP
 Returns the value from the deleted pair.
 .PP
 This routine supports the tied hash \s-1DELETE\s0 method, but may be called
-directly, too.
+directly, too.  \f(CW$pos\fR is not passed in the tied hash implementation,
+so the first matching key/value pair will be deleted in every case.
 .Sh "$pairs\->\fIclear()\fP;"
 .IX Subsection "$pairs->clear();"
 Expects no parameters.  Removes all key/value pairs from the object.
@@ -570,7 +571,7 @@ structure, and allows duplicate keys.
 .RE
 .SH "AUTHOR"
 .IX Header "AUTHOR"
-Brad Baxter, <bmb@galib.uga.edu>
+Brad Baxter, <bbaxter@cpan.org>
 .SH "COPYRIGHT AND LICENSE"
 .IX Header "COPYRIGHT AND LICENSE"
 Copyright (C) 2008 by Brad Baxter
