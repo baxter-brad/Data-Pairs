@@ -28,6 +28,6 @@ for $invalid_pairs (
 }
 
 $pairs = Data::Pairs->new( [{a=>1},{a=>2}] );
-is( $pairs->get_values('a'), 1,
+is( $pairs->get_values('a'), 2,
     "new() with valid pairs" );
 
